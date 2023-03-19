@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<meta charset="UTF-8">	<title>Voice Recorder</title>
+
+	<style>
+
+	*{
+
+	    text-align: center;
+
+	    margin: 50px;
+
+	}
+
+		button {
+
+			padding: 10px;
+
+			font-size: 18px;
+
+			border: none;
+
+			border-radius: 100px;
+
+			background-color: #4CAF50;
+
+			color: white;
+
+			margin-bottom: 10px;
+
+		}
+
+		button:hover {
+
+			background-color: #3e8e41;
+
+			box-shadow: 0 5px 50px 0 #00FFF2 inset, 0 5px 50px 0 #00FFF2;
+
+		}
+
+		#status {
+
+			font-size: 24px;
+
+			margin-bottom: 10px;
+
+		}
+
+	</style>
+
+</head>
+
+<body>
+
+	<button onclick="startRecording()">Start Recording</button>
+
+	<button onclick="stopRecording()">Stop Recording</button>
+
+	<p id="status">Click the "Start Recording" button to begin.</p>
+
+	<audio controls id="audio"></audio>
+
+	<script>
+
+		let mediaRecorder;
+
+		let chunks = [];
+
+		function startRecording() {
+
+			navigator.mediaDevices.getUserMedia({ audio: true })
+
+			.then(function(stream) {
+
+				mediaRecorder = new MediaRecorder(stream);
+
+				mediaRecorder.start();
+
+				mediaRecorder.addEventListener("dataavailable", function(event) {
+
+					chunks.push(event.data);
+
+				});
+
+				mediaRecorder.addEventListener("stop", function() {
+
+					const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+
+					const audioURL = URL.createObjectURL(blob);
+
+					document.querySelector("#audio").src = audioURL;
+
+					document.querySelector("#status").innerHTML = "Recording complete. Click the play button to listen.";
+
+				});
+
+			})
+
+			.catch(function(error) {
+
+				console.log("Error:", error);
+
+			});
+
+		}
+
+		function stopRecording() {
+
+			if (mediaRecorder) {
+
+				mediaRecorder.stop();
+
+			}
+
+			chunks = [];
+
+			document.querySelector("#status").innerHTML = "Recording stopped. Click the play button to listen.";
+
+		}
+
+	</script>
+
+</body>
+
+</html>
